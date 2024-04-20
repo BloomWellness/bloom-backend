@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// enum StrategyType {
+//   SOURCES_OF_HOPE
+//   RED_FLAGS
+//   SELF_CARE_STRATEGIES
+//   HELPFUL_ACTIVITES
+// }
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  mood    Mood[]
+  journals Journal[]
+}
+
+model Email_verification {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  otc        Int
+  isConsumed Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Password_reset {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  otc        Int
+  isConsumed Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Cbt {
+  id        Int   @id @default(autoincrement())
+  title     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+// enum Mood {
+//   HAPPY
+//   SAD
+//   SHOCKED
+//   ANGRY
+// }
+
+model Mood {
+  id        String   @id @default(uuid())
+  isMood      String
+  date      DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId   String
+  user     User    @relation(fields: [userId], references: [id])
+
+}
+
+model Journal {
+  id           String       @id @default(uuid())
+  strategyType String
+  description  String       @db.Text()
+  image        String?      @db.Text()
+  date         DateTime
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  userId       String
+  user         User         @relation(fields: [userId], references: [id])
+}
